@@ -1,0 +1,202 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int codigo;
+    double valorCredito;
+    char nome[300];
+} Curso;
+
+typedef struct {
+    int chave;
+    long ponteiro;
+} Indice;
+
+int compararPorCodigo(const void *a, const void *b) {
+    return ((Indice *)a)->chave - ((Indice *)b)->chave;
+}
+
+int compararPorNome(const void *a, const void *b) {
+    return strcmp(((Indice *)a)->chave, ((Indice *)b)->chave);
+}
+
+void buscarPorCodigo(int codigo, Indice *indiceCodigo, FILE *arquivo) {
+    int inicio = 0;
+    int fim = 99;  
+    int meio;
+
+    while (inicio <= fim) {
+        meio = (inicio + fim) / 2;
+
+        if (indiceCodigo[meio].chave == codigo) {
+            Curso curso;
+            fseek(arquivo, indiceCodigo[meio].ponteiro, SEEK_SET);
+            fread(&curso, sizeof(Curso), 1, arquivo);
+
+            printf("Codigo: %d\n", curso.codigo);
+            printf("Valor por Credito: %.2f\n", curso.valorCredito);
+            printf("Nome do Curso: %s\n", curso.nome);
+
+            return;
+        } else if (indiceCodigo[meio].chave < codigo) {
+            inicio = meio + 1;
+        } else {
+            fim = meio - 1;
+        }
+    }
+
+    printf("Curso nao encontrado.\n");
+}
+
+void buscarPorNome(char *nome, Indice *indiceNome, FILE *arquivo) {
+    int inicio = 0;
+    int fim = 99;  
+    int meio;
+
+    while (inicio <= fim) {
+        meio = (inicio + fim) / 2;
+
+        if (strcmp(indiceNome[meio].chave, nome) == 0) {
+            Curso curso;
+            fseek(arquivo, indiceNome[meio].ponteiro, SEEK_SET);
+            fread(&curso, sizeof(Curso), 1, arquivo);
+
+            printf("Codigo: %d\n", curso.codigo);
+            printf("Valor por Credito: %.2f\n", curso.valorCredito);
+            printf("Nome do Curso: %s\n", curso.nome);
+
+            return;
+        } else if (strcmp(indiceNome[meio].chave, nome) < 0) {
+            inicio = meio + 1;
+        } else {
+            fim = meio - 1;
+        }
+    }
+
+    printf("Curso nao encontrado.\n");
+}
+
+void cadastrarCursos() {
+    FILE *arquivo;
+    Curso curso;
+
+    arquivo = fopen("Cursos.dat", "ab");
+    if (arquivo == NULL) {
+        perror("Erro ao abrir o arquivo");
+        exit(EXIT_FAILURE);
+    }
+
+    do {
+        printf("Digite o codigo do curso (ou -1 para encerrar): ");
+        scanf("%d", &curso.codigo);
+
+        if (curso.codigo != -1) {
+            printf("Digite o valor por credito do curso: ");
+            scanf("%lf", &curso.valorCredito);
+
+            printf("Digite o nome do curso: ");
+            scanf(" %[^\n]", curso.nome);
+
+            fwrite(&curso, sizeof(Curso), 1, arquivo);
+        }
+    } while (curso.codigo != -1);
+
+    fclose(arquivo);
+}
+
+void criarIndices() {
+    FILE *arquivo;
+    Indice indiceCodigo[100], indiceNome[100];
+    Curso curso;
+    int i = 0;
+
+    arquivo = fopen("Cursos.dat", "rb");
+    if (arquivo == NULL) {
+        perror("Erro ao abrir o arquivo");
+        exit(EXIT_FAILURE);
+    }
+
+    while (fread(&curso, sizeof(Curso), 1, arquivo) == 1) {
+        indiceCodigo[i].chave = curso.codigo;
+        indiceCodigo[i].ponteiro = ftell(arquivo) - sizeof(Curso);
+
+        strcpy(indiceNome[i].chave, curso.nome);
+        indiceNome[i].ponteiro = ftell(arquivo) - sizeof(Curso);
+
+        i++;
+    }
+
+    qsort(indiceCodigo, i, sizeof(Indice), compararPorCodigo);
+
+    qsort(indiceNome, i, sizeof(Indice), compararPorNome);
+
+    fclose(arquivo);
+}
+
+void consultarCursos() {
+    FILE *arquivo;
+    Indice indiceCodigo[100], indiceNome[100];
+    Curso curso;
+    int opcao, chave, i;
+
+    arquivo = fopen("Cursos.dat", "rb");
+    if (arquivo == NULL) {
+        perror("Erro ao abrir o arquivo");
+        exit(EXIT_FAILURE);
+    }
+
+
+    do {
+        printf("Escolha o tipo de consulta (1 - Codigo, 2 - Nome, 0 - Sair): ");
+        scanf("%d", &opcao);
+
+        if (opcao == 1 || opcao == 2) {
+            printf("Digite a chave de pesquisa: ");
+            scanf("%d", &chave);
+
+            if (opcao == 1) {
+                buscarPorCodigo(chave, indiceCodigo, arquivo);
+            } else if (opcao == 2) {
+                buscarPorNome(chave, indiceNome, arquivo);
+            }
+        } else if (opcao != 0) {
+            printf("Opcao invalida. Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    fclose(arquivo);
+}
+
+int main() {
+    int opcao;
+
+    do {
+        printf("Escolha uma opcao:\n");
+        printf("1 - Cadastrar Cursos\n");
+        printf("2 - Criar Indices\n");
+        printf("3 - Consultar Cursos\n");
+        printf("0 - Sair\n");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                cadastrarCursos();
+                break;
+            case 2:
+                criarIndices();
+                break;
+            case 3:
+            
+                consultarCursos();
+                break;
+            case 0:
+                printf("Encerrando o programa. Ate mais!\n");
+                break;
+            default:
+                printf("Opcao invalida. Tente novamente.\n");
+        }
+    } while (opcao != 0);
+
+    return 0;
+}
