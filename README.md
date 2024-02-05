@@ -2,7 +2,6 @@
   <h2 style="font-size:30vw">Miniprojeto referente a matéria de Introdução a Programação - UFG.</h2>
 </div>
 
-## Motivação 
 O Miniprojeto 3 representa os conceitos fundamentais de manipulação de arquivos, uso de estruturas (struct) e aplicação de recursividade. Este programa tem como objetivo principal a gestão eficiente de informações acadêmicas, permitindo o rápido acesso aos dados de diversos cursos.
 
 Inicialmente, o usuário é convidado a inserir os detalhes de cada curso, incluindo informações cruciais, como código do curso, valor por crédito e nome do curso. Estes dados são então armazenados de forma organizada em um arquivo binário denominado "Cursos.dat".
