@@ -15,7 +15,7 @@ O diferencial desse projeto reside na capacidade da universidade em acessar rapi
 No terminal, siga os comandos: 
 
 ```bash
-git clone 'https://github.com/wederf13/Forca.git'
+git clone 'https://github.com/VitoriaSofiaa/miniprojeto3.git'
 cd Forca
 make
 ```
