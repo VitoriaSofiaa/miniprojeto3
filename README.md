@@ -8,19 +8,3 @@ Inicialmente, o usuário é convidado a inserir os detalhes de cada curso, inclu
 
 O diferencial desse projeto reside na capacidade da universidade em acessar rapidamente as informações dos cursos. Isso é alcançado por meio da implementação de índices ordenados, proporcionando um acesso eficiente aos dados de interesse. As consultas podem ser realizadas tanto pelo código do curso quanto pelo nome do curso, garantindo flexibilidade e agilidade no processo de recuperação de informações.
 
-## Instalação 
-
-### Linux
-
-No terminal, siga os comandos: 
-
-```bash
-git clone 'https://github.com/VitoriaSofiaa/miniprojeto3.git'
-cd Forca
-make
-```
-#### Uso
-Para executar:
-```bash
-./forca
-```
